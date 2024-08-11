@@ -15,6 +15,6 @@ public class BalanceStrategyFactory {
     }
 
     public static BalanceStrategy getStrategy(String mcc) {
-        return STRATEGY_MAP.getOrDefault(mcc, new DefaultBalanceStrategy());
+        return STRATEGY_MAP.getOrDefault(mcc, new CashBalanceStrategy());
     }
 }

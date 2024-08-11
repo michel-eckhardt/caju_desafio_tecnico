@@ -31,11 +31,11 @@ public class AuthController {
     }
 
     @PostMapping("authorizer")
-    public ResponseEntity<?> authorizer(@RequestBody TransactionDTO dto){
+    public ResponseEntity<?> authorizer(@RequestBody TransactionDTO dto, @RequestHeader Boolean fallback){
 
 
 
-        return ResponseEntity.ok().body(authService.authorizer(dto));
+        return ResponseEntity.ok().body(authService.authorizer(dto,fallback));
     }
 
 

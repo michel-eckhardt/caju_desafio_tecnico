@@ -8,12 +8,14 @@ import br.com.caju.auth.repository.AccountRepository;
 import br.com.caju.auth.strategy.BalanceStrategy;
 import br.com.caju.auth.strategy.BalanceStrategyFactory;
 import br.com.caju.auth.strategy.BalanceType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -23,7 +25,7 @@ public class AuthService {
     this.accountRepository = accountRepository;
     }
 
-    public ResponseDTO authorizer(TransactionDTO dto){
+    public ResponseDTO authorizer(TransactionDTO dto,Boolean fallback){
         dto.setId(UUID.randomUUID().toString());
 
         BalanceStrategy strategy = BalanceStrategyFactory.getStrategy(dto.getMcc());
@@ -31,10 +33,11 @@ public class AuthService {
         Optional<Account> account = accountRepository.findById(dto.getAccount());
         //valida se a conta existe
         if (account.isEmpty()) {
+            log.info("Conta não existe");
             return new ResponseDTO(TransactionStatusEnum.ERROR);
         }
 
-        return new ResponseDTO(strategy.determineBalance(dto, account.get(),accountRepository));
+        return new ResponseDTO(strategy.determineBalance(dto, account.get(),accountRepository,fallback));
     }
 
     private TransactionStatusEnum determineTransactionStatus(BalanceType balanceType, TransactionDTO payload) {
