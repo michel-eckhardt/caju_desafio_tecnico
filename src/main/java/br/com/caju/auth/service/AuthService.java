@@ -7,9 +7,7 @@ import br.com.caju.auth.model.Account;
 import br.com.caju.auth.repository.AccountRepository;
 import br.com.caju.auth.strategy.BalanceStrategy;
 import br.com.caju.auth.strategy.BalanceStrategyFactory;
-import br.com.caju.auth.strategy.BalanceType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -40,18 +38,5 @@ public class AuthService {
         return new ResponseDTO(strategy.determineBalance(dto, account.get(),accountRepository,fallback));
     }
 
-    private TransactionStatusEnum determineTransactionStatus(BalanceType balanceType, TransactionDTO payload) {
-        if (hasSufficientBalance(balanceType, payload)) {
-            return TransactionStatusEnum.APPROVED;
-        } else if (!hasSufficientBalance(balanceType, payload)) {
-            return TransactionStatusEnum.INSUFFICIENT_FUNDS;
-        }
-        return TransactionStatusEnum.ERROR;
-    }
-
-    private boolean hasSufficientBalance(BalanceType balanceType, TransactionDTO payload) {
-        //verificação de saldo de acordo com o balanceType
-        return true;
-    }
 
 }
