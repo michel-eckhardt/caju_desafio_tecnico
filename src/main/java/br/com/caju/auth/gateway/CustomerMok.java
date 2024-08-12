@@ -14,4 +14,13 @@ public class CustomerMok {
         customers.add(new Customer("PICPAY*BILHETEUNICO           GOIANIA BR","CASH"));
         customers.add(new Customer("PADARIA DO ZE               SAO PAULO BR","MEAL"));
     }
+
+    public Customer findByName(String name) {
+        for (Customer customer : customers) {
+            if (customer.getMerchant().equalsIgnoreCase(name)) {
+                return customer;
+            }
+        }
+        return null;
+    }
 }
