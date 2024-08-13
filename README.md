@@ -68,6 +68,8 @@ A aplicação foi desenvolvida seguindo o padrão REST. Abaixo, uma breve descri
 2. A aplicação estará disponível em: http://localhost:8080/auth/v1
 
 ### Endpoints Principais
+- **SWAGGER** 
+http://localhost:8080/auth/swagger-ui/
 - **GET /account/{accountId}**: Retorna a conta por ID.
 - **POST /authorizer**: Realiza uma transação.
 

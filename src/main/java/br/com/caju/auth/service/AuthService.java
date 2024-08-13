@@ -29,7 +29,6 @@ public class AuthService {
         BalanceStrategy strategy = BalanceStrategyFactory.getStrategy(dto.getMcc());
 
         Optional<Account> account = accountRepository.findById(dto.getAccount());
-        //valida se a conta existe
         if (account.isEmpty()) {
             log.info("Conta não existe");
             return new ResponseDTO(TransactionStatusEnum.ERROR);

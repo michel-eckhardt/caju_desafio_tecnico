@@ -8,57 +8,59 @@ import br.com.caju.auth.model.Account;
 import br.com.caju.auth.repository.AccountRepository;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.util.Objects;
+
 @Slf4j
 public class MealBalanceStrategy implements BalanceStrategy {
     @Override
-    public TransactionStatusEnum determineBalance(TransactionDTO dto, Account account, AccountRepository accountRepository,Boolean fallback) {
-        if ("5811".equals(dto.getMcc()) || "5812".equals(dto.getMcc())) {
+    public TransactionStatusEnum determineBalance(TransactionDTO dto, Account account, AccountRepository accountRepository, Boolean fallback) {
+        if (dto.getTotalAmount().compareTo(new BigDecimal(0)) > 0) {
 
             if (dto.getTotalAmount().compareTo(account.getMeal()) > 0) {
-                if (fallback){
-                    return insufficientBalanceInCategory(dto,account,accountRepository);
+                if (!fallback) {
+                    log.info("[codigo {}] Saldo REFEICAO insuficiente na conta {}", dto.getId(), dto.getAccount());
+                    return TransactionStatusEnum.INSUFFICIENT_FUNDS;
                 }
-                log.info("[codigo {}] Saldo REFEICAO insuficiente na conta {}",dto.getId(),dto.getAccount());
-                return TransactionStatusEnum.INSUFFICIENT_FUNDS;
+                return insufficientBalanceInCategory(dto, account, accountRepository);
             }
 
             account.setMeal(account.getMeal().subtract(dto.getTotalAmount()));
             accountRepository.save(account);
-            log.info("[codigo {}] Transacao ALIMENTACAO aprovada",dto.getId());
+            log.info("[codigo {}] Transacao REFEICAO aprovada", dto.getId());
             return TransactionStatusEnum.APPROVED;
         }
+        log.info("[codigo {}] valor para REFEICAO menor ou igual a 0 {}", dto.getId(), dto.getAccount());
         return TransactionStatusEnum.ERROR;
     }
 
-    private TransactionStatusEnum insufficientBalanceInCategory(TransactionDTO dto, Account account,AccountRepository accountRepository){
+    private TransactionStatusEnum insufficientBalanceInCategory(TransactionDTO dto, Account account, AccountRepository accountRepository) {
 
         CustomerMok customerMok = new CustomerMok();
         Customer customer = customerMok.findByName(dto.getMerchant());
 
-        if (customer != null){
-            if(customer.getBalanceType().equals("FOOD")){
+        if (Objects.nonNull(customer) && customer.getBalanceType().equals("FOOD")) {
 
-                if (dto.getTotalAmount().compareTo(account.getFood()) > 0) {
-                    log.info("[FALLBACK codigo {}] Saldo FOOD insuficiente na conta {}",dto.getId(), dto.getAccount());
-                    return TransactionStatusEnum.INSUFFICIENT_FUNDS;
-                }
-
-                account.setFood(account.getFood().subtract(dto.getTotalAmount()));
-                accountRepository.save(account);
-                log.info("[FALLBACK codigo {}] Transacao FOOD aprovada",dto.getId());
-                return TransactionStatusEnum.APPROVED;
-
+            if (dto.getTotalAmount().compareTo(account.getFood()) > 0) {
+                log.info("[FALLBACK codigo {}] Saldo FOOD insuficiente na conta {}", dto.getId(), dto.getAccount());
+                return TransactionStatusEnum.INSUFFICIENT_FUNDS;
             }
+
+            account.setFood(account.getFood().subtract(dto.getTotalAmount()));
+            accountRepository.save(account);
+            log.info("[FALLBACK codigo {}] Transacao FOOD aprovada", dto.getId());
+            return TransactionStatusEnum.APPROVED;
+
         }
 
         if (dto.getTotalAmount().compareTo(account.getCash()) > 0) {
-            log.info("[FALLBACK codigo {}] Saldo DINHEIRO insuficiente na conta {}",dto.getId(), dto.getAccount());
+            log.info("[FALLBACK codigo {}] Saldo DINHEIRO insuficiente na conta {}", dto.getId(), dto.getAccount());
             return TransactionStatusEnum.INSUFFICIENT_FUNDS;
         }
 
         account.setCash(account.getCash().subtract(dto.getTotalAmount()));
         accountRepository.save(account);
-        log.info("[FALLBACK codigo {}] Transacao DINHEIRO aprovada",dto.getId());
+        log.info("[FALLBACK codigo {}] Transacao DINHEIRO aprovada", dto.getId());
         return TransactionStatusEnum.APPROVED;
     }
 

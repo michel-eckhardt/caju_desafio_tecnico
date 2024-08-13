@@ -3,15 +3,15 @@ package br.com.caju.auth.controller;
 import br.com.caju.auth.dto.ResponseDTO;
 import br.com.caju.auth.dto.TransactionDTO;
 import br.com.caju.auth.model.Account;
-import br.com.caju.auth.repository.AccountRepository;
 import br.com.caju.auth.service.AuthService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 
 @RestController
@@ -37,7 +37,7 @@ public class AuthController {
             response = ResponseDTO.class)
     })
     @PostMapping("authorizer")
-    public ResponseEntity<?> authorizer(@RequestBody TransactionDTO dto,
+    public ResponseEntity<?> authorizer(@Valid @RequestBody TransactionDTO dto,
                                         @ApiParam(value = "Ativa/Desativa a opção de Fallback", required = true)@RequestHeader Boolean fallback){
         return ResponseEntity.ok().body(authService.authorizer(dto,fallback));
     }
