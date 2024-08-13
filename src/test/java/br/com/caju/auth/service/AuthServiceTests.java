@@ -157,7 +157,7 @@ public class AuthServiceTests {
     void testFoodAuthorizerInsufficientFoundsWithFallback(){
         transactionDTO.setMcc("5411");
         when(accountRepository.findById(transactionDTO.getAccount())).thenReturn(Optional.of(
-                new Account("123",new BigDecimal(1),new BigDecimal(10000),new BigDecimal(1))));
+                new Account("123",new BigDecimal(1),new BigDecimal(10),new BigDecimal(1))));
         ResponseDTO expectedResponseDTO = new ResponseDTO(TransactionStatusEnum.INSUFFICIENT_FUNDS);
 
         ResponseDTO responseDTO = authService.authorizer(transactionDTO,true);
