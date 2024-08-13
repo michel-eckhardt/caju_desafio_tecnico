@@ -38,5 +38,11 @@ public class AuthService {
         return new ResponseDTO(strategy.determineBalance(dto, account.get(),accountRepository,fallback));
     }
 
+    public Account findAccountById(String accountId){
+        Optional<Account> account = accountRepository.findById(accountId);
+
+        return account.isEmpty() ? null : account.get();
+    }
+
 
 }

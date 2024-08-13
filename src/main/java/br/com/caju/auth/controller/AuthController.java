@@ -20,9 +20,6 @@ public class AuthController {
 
     AuthService authService;
 
-    @Autowired
-    AccountRepository accountRepository;
-
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
@@ -49,7 +46,7 @@ public class AuthController {
     @ApiOperation(value = "Consultar Account", notes = "Busca Accounts por ids")
     @GetMapping("/account/{accountId}")
     public Account findById(@ApiParam(value = "ID da conta a ser buscada", required = true)@PathVariable String accountId){
-        return accountRepository.findById(accountId).get();
+        return authService.findAccountById(accountId);
     }
 
 }
